@@ -3,9 +3,11 @@ package com.reco.app.data.repository
 import com.reco.app.BuildConfig
 import com.reco.app.data.model.Movie
 import com.reco.app.data.model.Platform
+import com.reco.app.data.remote.MovieDetailDto
 import com.reco.app.data.remote.TmdbApi
 import com.reco.app.data.remote.TmdbClient
 import com.reco.app.data.remote.TrendingItemDto
+import com.reco.app.data.remote.TvDetailDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
@@ -47,6 +49,28 @@ class MovieRepository(
         }
     }
 
+    suspend fun getMovieDetail(id: Int): Result<Movie> = withContext(Dispatchers.IO) {
+        val key = BuildConfig.TMDB_API_KEY
+        if (key.isBlank()) {
+            return@withContext Result.success(demoMovies().firstOrNull { it.id == id } ?: demoMovies().first())
+        }
+        runCatching {
+            val dto = api.movieDetail(id, key)
+            mapMovieDetail(dto)
+        }
+    }
+
+    suspend fun getTvDetail(id: Int): Result<Movie> = withContext(Dispatchers.IO) {
+        val key = BuildConfig.TMDB_API_KEY
+        if (key.isBlank()) {
+            return@withContext Result.success(demoMovies().firstOrNull { it.id == id } ?: demoMovies().first())
+        }
+        runCatching {
+            val dto = api.tvDetail(id, key)
+            mapTvDetail(dto)
+        }
+    }
+
     private fun mapDto(dto: TrendingItemDto): Movie {
         val mt = if (dto.mediaType == "tv") "tv" else "movie"
         val displayTitle = dto.title?.takeIf { it.isNotBlank() }
@@ -72,6 +96,51 @@ class MovieRepository(
             voteAverage = dto.voteAverage ?: 0.0,
             platforms = platforms,
         )
+    }
+
+    private fun mapMovieDetail(dto: MovieDetailDto): Movie {
+        val date = dto.releaseDate?.takeIf { it.length >= 4 } ?: ""
+        val runtimeText = dto.runtime?.takeIf { it > 0 }?.let { minutesToText(it) } ?: ""
+        val genres = dto.genres.orEmpty().map { it.name }.take(3)
+        return Movie(
+            id = dto.id,
+            mediaType = "movie",
+            title = dto.title?.takeIf { it.isNotBlank() } ?: "Sin título",
+            year = date.take(4).ifBlank { "—" },
+            runtime = runtimeText,
+            genres = genres,
+            synopsis = dto.overview.orEmpty(),
+            posterPath = dto.posterPath,
+            backdropPath = dto.backdropPath,
+            voteAverage = dto.voteAverage ?: 0.0,
+            platforms = platformsForId(dto.id),
+        )
+    }
+
+    private fun mapTvDetail(dto: TvDetailDto): Movie {
+        val date = dto.firstAirDate?.takeIf { it.length >= 4 } ?: ""
+        val runtimeMinutes = dto.episodeRunTime.orEmpty().firstOrNull() ?: 0
+        val runtimeText = runtimeMinutes.takeIf { it > 0 }?.let { minutesToText(it) } ?: ""
+        val genres = dto.genres.orEmpty().map { it.name }.take(3)
+        return Movie(
+            id = dto.id,
+            mediaType = "tv",
+            title = dto.name?.takeIf { it.isNotBlank() } ?: "Sin título",
+            year = date.take(4).ifBlank { "—" },
+            runtime = runtimeText,
+            genres = genres,
+            synopsis = dto.overview.orEmpty(),
+            posterPath = dto.posterPath,
+            backdropPath = dto.backdropPath,
+            voteAverage = dto.voteAverage ?: 0.0,
+            platforms = platformsForId(dto.id),
+        )
+    }
+
+    private fun minutesToText(totalMinutes: Int): String {
+        val hours = totalMinutes / 60
+        val minutes = totalMinutes % 60
+        return if (hours > 0) "$hours h ${minutes}m" else "${minutes}m"
     }
 
     private fun platformsForId(id: Int): List<Platform> {
