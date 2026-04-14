@@ -52,6 +52,8 @@ private val platformFilters = listOf(
 fun HomeScreen(
     viewModel: HomeViewModel,
     onMovieTap: (mediaType: String, id: Int) -> Unit,
+    onSeeAllTrending: () -> Unit,
+    onSeeAllByGenre: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val selectedPlatform by viewModel.selectedPlatform.collectAsStateWithLifecycle()
@@ -92,6 +94,8 @@ fun HomeScreen(
                     selectedPlatform = selectedPlatform,
                     onSelectPlatform = viewModel::selectPlatform,
                     onMovieTap = onMovieTap,
+                    onSeeAllTrending = onSeeAllTrending,
+                    onSeeAllByGenre = onSeeAllByGenre,
                 )
             }
             else -> Unit
@@ -105,6 +109,8 @@ private fun HomeContent(
     selectedPlatform: Platform?,
     onSelectPlatform: (Platform?) -> Unit,
     onMovieTap: (String, Int) -> Unit,
+    onSeeAllTrending: () -> Unit,
+    onSeeAllByGenre: () -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -171,7 +177,7 @@ private fun HomeContent(
         item {
             SectionHeader(
                 title = "Tendencias",
-                onSeeAll = { },
+                onSeeAll = onSeeAllTrending,
                 modifier = Modifier.padding(horizontal = 20.dp),
             )
         }
@@ -195,7 +201,7 @@ private fun HomeContent(
         item {
             SectionHeader(
                 title = "Por tus géneros",
-                onSeeAll = { },
+                onSeeAll = onSeeAllByGenre,
                 modifier = Modifier.padding(horizontal = 20.dp),
             )
         }

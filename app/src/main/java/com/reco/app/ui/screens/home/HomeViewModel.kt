@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.reco.app.data.model.Movie
 import com.reco.app.data.model.Platform
+import com.reco.app.data.preferences.UserPreferences
 import com.reco.app.data.repository.MovieRepository
 import com.reco.app.util.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class HomeUiModel(
-    val userName: String = "Ana",
+    val userName: String = "tú",
     val hero: Movie?,
     val trendingRow: List<Movie>,
     val byGenreRow: List<Movie>,
@@ -24,6 +25,7 @@ data class HomeUiModel(
 
 class HomeViewModel(
     private val repository: MovieRepository,
+    private val userPreferences: UserPreferences,
 ) : ViewModel() {
 
     private val _loading = MutableStateFlow(true)
@@ -38,11 +40,12 @@ class HomeViewModel(
         _error,
         _movies,
         _selectedPlatform,
-    ) { loading, err, movies, platform ->
+        userPreferences.userName,
+    ) { loading, err, movies, platform, userName ->
         when {
             loading -> UiState.Loading
             err != null -> UiState.Error(err)
-            else -> UiState.Success(buildUiModel(movies, platform))
+            else -> UiState.Success(buildUiModel(userName, movies, platform))
         }
     }.stateIn(
         scope = viewModelScope,
@@ -75,13 +78,14 @@ class HomeViewModel(
         _selectedPlatform.update { platform }
     }
 
-    private fun buildUiModel(movies: List<Movie>, platform: Platform?): HomeUiModel {
+    private fun buildUiModel(userName: String, movies: List<Movie>, platform: Platform?): HomeUiModel {
         val filtered = when (platform) {
             null -> movies
             else -> movies.filter { platform in it.platforms }
         }
         if (filtered.isEmpty()) {
             return HomeUiModel(
+                userName = userName,
                 hero = null,
                 trendingRow = emptyList(),
                 byGenreRow = emptyList(),
@@ -92,6 +96,7 @@ class HomeViewModel(
         val trending = rest.take(10)
         val byGenre = filtered.takeLast(minOf(5, filtered.size))
         return HomeUiModel(
+            userName = userName,
             hero = hero,
             trendingRow = trending,
             byGenreRow = byGenre,
@@ -99,11 +104,14 @@ class HomeViewModel(
     }
 
     companion object {
-        fun Factory(repository: MovieRepository) = object : ViewModelProvider.Factory {
+        fun Factory(
+            repository: MovieRepository,
+            userPreferences: UserPreferences,
+        ) = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                 require(modelClass.isAssignableFrom(HomeViewModel::class.java))
-                return HomeViewModel(repository) as T
+                return HomeViewModel(repository, userPreferences) as T
             }
         }
     }
