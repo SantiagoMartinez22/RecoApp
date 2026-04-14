@@ -13,6 +13,7 @@ import com.reco.app.ui.screens.auth.LoginScreen
 import com.reco.app.ui.screens.auth.LoginViewModel
 import com.reco.app.ui.screens.auth.RegisterScreen
 import com.reco.app.ui.screens.auth.RegisterViewModel
+import com.reco.app.ui.screens.credits.CreditsScreen
 import com.reco.app.ui.screens.splash.SplashScreen
 
 @Composable
@@ -69,7 +70,21 @@ fun RecoNavHost(
             )
         }
         composable(Screen.Main.route) {
-            MainScaffold(movieRepository = movieRepository)
+            MainScaffold(
+                movieRepository = movieRepository,
+                authRepository = authRepository,
+                onNavigateToCredits = {
+                    navController.navigate(Screen.Credits.route)
+                },
+                onSignOut = {
+                    navController.navigate(Screen.Splash.route) {
+                        popUpTo(Screen.Main.route) { inclusive = true }
+                    }
+                },
+            )
+        }
+        composable(Screen.Credits.route) {
+            CreditsScreen(onBack = { navController.popBackStack() })
         }
     }
 }

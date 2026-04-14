@@ -12,4 +12,12 @@ sealed class Screen(val route: String) {
     data object Search : Screen("search")
     data object Lists : Screen("lists")
     data object Settings : Screen("settings")
+
+    data object Credits : Screen("credits")
+    data object Detail : Screen("detail/{mediaType}/{id}") {
+        const val MEDIA_TYPE_ARG = "mediaType"
+        const val ID_ARG = "id"
+
+        fun buildRoute(mediaType: String, id: Int): String = "detail/$mediaType/$id"
+    }
 }
