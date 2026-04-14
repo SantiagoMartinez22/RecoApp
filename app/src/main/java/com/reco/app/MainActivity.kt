@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import com.reco.app.data.preferences.UserPreferences
 import com.reco.app.data.repository.AuthRepository
 import com.reco.app.navigation.RecoNavHost
 import com.reco.app.navigation.Screen
@@ -33,7 +34,8 @@ class MainActivity : ComponentActivity() {
 
             RecoTheme(themeMode = themeMode) {
                 val navController = rememberNavController()
-                val authRepository = remember { AuthRepository() }
+                val userPreferences = remember { UserPreferences(applicationContext) }
+                val authRepository = remember { AuthRepository(userPreferences) }
                 // Sin Firebase no hay sesión persistente; siempre arranca en Splash.
                 val startDestination = Screen.Splash.route
                 Surface(
