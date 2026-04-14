@@ -1,0 +1,20 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Android Studio / IDEA
+.idea/
+*.iml
+local.properties
+captures/
+
+# Keystore
+*.jks
+*.keystore
+
+# OS
+.DS_Store
+
+# Firebase (optional: keep out of VCS if you prefer secrets local only)
+# app/google-services.json
