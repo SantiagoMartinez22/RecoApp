@@ -1,12 +1,13 @@
 # RECO (Android)
 
 App móvil **Kotlin + Jetpack Compose**, tema claro/oscuro alineado al diseño en `index.html`.  
-**Modo actual:** autenticación **simulada** en `AuthRepository` (sin Firebase) para compilar y probar la UI. Firebase se configura después (ver `docs/FIREBASE_SETUP.md`).
+**Modo actual:** autenticación **simulada** en `AuthRepository` (sin Firebase). La pantalla **Inicio** usa la API de **TMDB** (posters con **Coil**); sin clave en `local.properties` se muestran datos demo. Firebase: `docs/FIREBASE_SETUP.md`.
 
 ## Requisitos
 
 - Android Studio Ladybug+ (o JDK 17 + Android SDK)
 - Copia `local.properties.example` a `local.properties` y define `sdk.dir` apuntando a tu Android SDK.
+- Opcional: `tmdb.api.key=` con tu clave de [themoviedb.org](https://www.themoviedb.org/settings/api) para tendencias reales.
 
 ## Configuración Firebase
 
@@ -19,10 +20,10 @@ Sigue **[docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md)** para:
 ## Módulos y paquetes
 
 - `com.reco.app` — `MainActivity`, `RecoApplication`
-- `navigation` — `Screen`, `RecoNavHost`
+- `navigation` — `Screen`, `RecoNavHost`, `MainScaffold` (tabs Inicio / Buscar / Listas / Ajustes)
 - `ui/theme` — colores del diseño, tipografía, `RecoTheme`, `ThemeViewModel` + DataStore
-- `ui/screens` — Splash, Login, Register, Home (placeholder)
-- `data/repository` — `AuthRepository`
+- `ui/screens` — Splash, Login, Register, Home (`HomeViewModel` + TMDB)
+- `data/repository` — `AuthRepository`, `MovieRepository`
 
 ## Compilar
 
@@ -32,7 +33,7 @@ Sigue **[docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md)** para:
 
 ## Flujo
 
-- Sin sesión: arranca en **Splash** → **Registro** o **Login** → **Home** (placeholder).
-- Con sesión guardada: arranca en **Home**.
+- Sin sesión: **Splash** → **Registro** o **Login** → **Main** (barra inferior: Inicio con recomendaciones TMDB; otras pestañas stub).
+- Tras login/registro se limpia el back stack hasta **Main**.
 
 El modo claro/oscuro sigue el sistema por defecto (`ThemeMode.SYSTEM`); el toggle en Ajustes se puede enlazar a `ThemeViewModel.setThemeMode` en una fase posterior.

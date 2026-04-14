@@ -1,17 +1,18 @@
 package com.reco.app.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.reco.app.data.repository.AuthRepository
+import com.reco.app.data.repository.MovieRepository
 import com.reco.app.ui.screens.auth.LoginScreen
 import com.reco.app.ui.screens.auth.LoginViewModel
 import com.reco.app.ui.screens.auth.RegisterScreen
 import com.reco.app.ui.screens.auth.RegisterViewModel
-import com.reco.app.ui.screens.home.HomeScreen
 import com.reco.app.ui.screens.splash.SplashScreen
 
 @Composable
@@ -21,6 +22,8 @@ fun RecoNavHost(
     authRepository: AuthRepository,
     modifier: Modifier = Modifier,
 ) {
+    val movieRepository = remember { MovieRepository() }
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -45,7 +48,7 @@ fun RecoNavHost(
                 onBack = { navController.popBackStack() },
                 onRegisterClick = { navController.navigate(Screen.Register.route) },
                 onAuthSuccess = {
-                    navController.navigate(Screen.Home.route) {
+                    navController.navigate(Screen.Main.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 },
@@ -59,14 +62,14 @@ fun RecoNavHost(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
                 onSuccess = {
-                    navController.navigate(Screen.Home.route) {
+                    navController.navigate(Screen.Main.route) {
                         popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 },
             )
         }
-        composable(Screen.Home.route) {
-            HomeScreen()
+        composable(Screen.Main.route) {
+            MainScaffold(movieRepository = movieRepository)
         }
     }
 }

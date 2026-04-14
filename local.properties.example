@@ -3,3 +3,6 @@
 # sdk.dir=/Users/TU_USUARIO/Library/Android/sdk
 
 sdk.dir=/path/to/Android/sdk
+
+# Opcional: clave API de TMDB (https://www.themoviedb.org/settings/api)
+# tmdb.api.key=TU_CLAVE
