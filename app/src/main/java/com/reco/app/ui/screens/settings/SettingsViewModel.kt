@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 
 data class SettingsUiModel(
     val userName: String,
+    val userEmail: String,
     val notifRecommendations: Boolean,
     val notifReleases: Boolean,
     val platformSubscriptions: Set<String>,
@@ -30,13 +31,22 @@ class SettingsViewModel(
 
     val uiModel: StateFlow<SettingsUiModel> = combine(
         userPreferences.userName,
+        userPreferences.userEmail,
         userPreferences.notifRecommendations,
         userPreferences.notifReleases,
         userPreferences.platformSubscriptions,
         themePreferences.themeMode,
-    ) { userName, notifReco, notifReleases, subscriptions, themeMode ->
+    ) { values: Array<Any?> ->
+        val userName = values[0] as String
+        val userEmail = values[1] as String
+        val notifReco = values[2] as Boolean
+        val notifReleases = values[3] as Boolean
+        @Suppress("UNCHECKED_CAST")
+        val subscriptions = values[4] as Set<String>
+        val themeMode = values[5] as ThemeMode
         SettingsUiModel(
             userName = userName,
+            userEmail = userEmail,
             notifRecommendations = notifReco,
             notifReleases = notifReleases,
             platformSubscriptions = subscriptions,
@@ -47,6 +57,7 @@ class SettingsViewModel(
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = SettingsUiModel(
             userName = "tú",
+            userEmail = "",
             notifRecommendations = true,
             notifReleases = true,
             platformSubscriptions = Platform.entries.map { it.label }.toSet(),

@@ -66,7 +66,7 @@ fun SettingsScreen(
                 Column(modifier = Modifier.padding(start = 12.dp)) {
                     Text(text = uiModel.userName, style = MaterialTheme.typography.titleMedium)
                     Text(
-                        text = "demo@reco.app",
+                        text = uiModel.userEmail.ifBlank { "Sin correo configurado" },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -126,12 +126,17 @@ fun SettingsScreen(
                 text = "Cambiar contraseña",
                 onClick = {
                     scope.launch {
-                        val result = viewModel.sendPasswordResetEmail("demo@reco.app")
-                        val message = result.fold(
-                            onSuccess = { "Correo de restablecimiento enviado" },
-                            onFailure = { it.message ?: "No se pudo enviar el correo" },
-                        )
-                        snackbarHostState.showSnackbar(message)
+                        val email = uiModel.userEmail.trim()
+                        if (email.isBlank()) {
+                            snackbarHostState.showSnackbar("No hay correo configurado")
+                        } else {
+                            val result = viewModel.sendPasswordResetEmail(email)
+                            val message = result.fold(
+                                onSuccess = { "Correo de restablecimiento enviado" },
+                                onFailure = { it.message ?: "No se pudo enviar el correo" },
+                            )
+                            snackbarHostState.showSnackbar(message)
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
