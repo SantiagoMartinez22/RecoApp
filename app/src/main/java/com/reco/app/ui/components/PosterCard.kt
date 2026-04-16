@@ -11,6 +11,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +36,8 @@ fun PosterCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     badgeSize: androidx.compose.ui.unit.Dp = 22.dp,
+    isFavorite: Boolean = false,
+    onFavoriteClick: (() -> Unit)? = null,
 ) {
     val posterUrl = TmdbImageUrls.posterUrl(movie.posterPath)
     Column(
@@ -67,6 +74,18 @@ fun PosterCard(
             ) {
                 movie.platforms.take(3).forEach { p ->
                     PlatformBadge(platform = p, size = badgeSize, fontSize = 6.sp)
+                }
+            }
+            if (onFavoriteClick != null) {
+                IconButton(
+                    onClick = onFavoriteClick,
+                    modifier = Modifier.align(Alignment.TopEnd),
+                ) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                        contentDescription = if (isFavorite) "Quitar de favoritos" else "Añadir a favoritos",
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
                 }
             }
         }
