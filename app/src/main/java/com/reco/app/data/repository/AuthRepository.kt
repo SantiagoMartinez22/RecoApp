@@ -17,6 +17,7 @@ class AuthRepository(
     suspend fun signInWithEmailAndPassword(email: String, password: String): Result<Unit> =
         withContext(Dispatchers.IO) {
             delay(DEMO_DELAY_MS)
+            userPreferences.setUserEmail(email)
             Result.success(Unit)
         }
 
@@ -36,6 +37,7 @@ class AuthRepository(
     ): Result<Unit> = withContext(Dispatchers.IO) {
         delay(DEMO_DELAY_MS)
         userPreferences.setUserName(name)
+        userPreferences.setUserEmail(email)
         Result.success(Unit)
     }
 

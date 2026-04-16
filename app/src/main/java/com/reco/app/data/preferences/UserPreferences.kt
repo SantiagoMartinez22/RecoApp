@@ -23,6 +23,9 @@ class UserPreferences(private val context: Context) {
         }
         .map { prefs -> prefs[USER_NAME_KEY].orEmpty().ifBlank { "tú" } }
 
+    val userEmail: Flow<String> = context.recoDataStore.data
+        .map { prefs -> prefs[USER_EMAIL_KEY].orEmpty() }
+
     val favoritesIds: Flow<Set<String>> = context.recoDataStore.data
         .map { prefs -> prefs[FAVORITES_IDS_KEY] ?: emptySet() }
 
@@ -38,6 +41,12 @@ class UserPreferences(private val context: Context) {
     suspend fun setUserName(value: String) {
         context.recoDataStore.edit { prefs ->
             prefs[USER_NAME_KEY] = value.trim()
+        }
+    }
+
+    suspend fun setUserEmail(value: String) {
+        context.recoDataStore.edit { prefs ->
+            prefs[USER_EMAIL_KEY] = value.trim()
         }
     }
 
@@ -76,12 +85,14 @@ class UserPreferences(private val context: Context) {
     suspend fun clearSession() {
         context.recoDataStore.edit { prefs ->
             prefs.remove(USER_NAME_KEY)
+            prefs.remove(USER_EMAIL_KEY)
             prefs.remove(FAVORITES_IDS_KEY)
         }
     }
 
     companion object {
         private val USER_NAME_KEY = stringPreferencesKey("user_name")
+        private val USER_EMAIL_KEY = stringPreferencesKey("user_email")
         private val FAVORITES_IDS_KEY = stringSetPreferencesKey("fav_movie_ids")
         private val PLATFORM_SUBSCRIPTIONS_KEY = stringSetPreferencesKey("platform_subscriptions")
         private val NOTIF_RECOMMENDATIONS_KEY = booleanPreferencesKey("notif_recommendations")
