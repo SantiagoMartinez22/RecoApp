@@ -1,18 +1,13 @@
 package com.reco.app.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -30,6 +25,8 @@ import com.reco.app.ui.screens.detail.DetailScreen
 import com.reco.app.ui.screens.detail.DetailViewModel
 import com.reco.app.ui.screens.home.HomeScreen
 import com.reco.app.ui.screens.home.HomeViewModel
+import com.reco.app.ui.screens.lists.ListsScreen
+import com.reco.app.ui.screens.lists.ListsViewModel
 import com.reco.app.ui.screens.search.SearchScreen
 import com.reco.app.ui.screens.search.SearchViewModel
 import com.reco.app.ui.screens.settings.SettingsScreen
@@ -102,7 +99,7 @@ fun MainScaffold(
             }
             composable(Screen.Search.route) {
                 val viewModel: SearchViewModel = viewModel(
-                    factory = SearchViewModel.Factory(movieRepository),
+                    factory = SearchViewModel.Factory(movieRepository, userPreferences),
                 )
                 SearchScreen(
                     viewModel = viewModel,
@@ -112,7 +109,15 @@ fun MainScaffold(
                 )
             }
             composable(Screen.Lists.route) {
-                PlaceholderTab(text = "Listas — próximamente")
+                val viewModel: ListsViewModel = viewModel(
+                    factory = ListsViewModel.Factory(movieRepository, userPreferences),
+                )
+                ListsScreen(
+                    viewModel = viewModel,
+                    onMovieTap = { mediaType, id ->
+                        mainNavController.navigate(Screen.Detail.buildRoute(mediaType, id))
+                    },
+                )
             }
             composable(Screen.Settings.route) {
                 val viewModel: SettingsViewModel = viewModel(
@@ -148,6 +153,7 @@ fun MainScaffold(
                         repository = movieRepository,
                         mediaType = mediaType,
                         id = id,
+                        userPreferences = userPreferences,
                     ),
                 )
                 DetailScreen(
@@ -156,20 +162,5 @@ fun MainScaffold(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun PlaceholderTab(text: String) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
     }
 }
