@@ -36,6 +36,7 @@ fun SearchScreen(
     val query by viewModel.query.collectAsStateWithLifecycle()
     val selectedGenre by viewModel.selectedGenre.collectAsStateWithLifecycle()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val favoritesIds by viewModel.favoritesIds.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -119,6 +120,8 @@ fun SearchScreen(
                                 PosterCard(
                                     movie = movie,
                                     onClick = { onMovieTap(movie.mediaType, movie.id) },
+                                    isFavorite = "${movie.mediaType}:${movie.id}" in favoritesIds,
+                                    onFavoriteClick = { viewModel.toggleFavorite(movie) },
                                     modifier = Modifier.fillMaxWidth(),
                                 )
                             }
