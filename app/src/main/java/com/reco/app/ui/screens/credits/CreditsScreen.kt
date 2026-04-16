@@ -26,6 +26,14 @@ import androidx.compose.ui.unit.dp
 fun CreditsScreen(
     onBack: () -> Unit,
 ) {
+    val teamMembers = listOf(
+        TeamMember(
+            name = "Equipo de desarrollo",
+            role = "Aplicación académica Kotlin / Android",
+            email = "Información institucional pendiente",
+        ),
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,9 +70,9 @@ fun CreditsScreen(
         Text(text = "Equipo", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(8.dp))
 
-        TeamCard(name = "Integrante 1", role = "Desarrollo móvil", email = "miembro1@correo.edu")
-        TeamCard(name = "Integrante 2", role = "Diseño UX/UI", email = "miembro2@correo.edu")
-        TeamCard(name = "Integrante 3", role = "Backend/API", email = "miembro3@correo.edu")
+        teamMembers.forEach { member ->
+            TeamCard(name = member.name, role = member.role, email = member.email)
+        }
 
         Spacer(modifier = Modifier.height(10.dp))
         Card(modifier = Modifier.fillMaxWidth()) {
@@ -73,7 +81,7 @@ fun CreditsScreen(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(text = "Institución", style = MaterialTheme.typography.titleMedium)
-                Text(text = "Universidad - Facultad", style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Información institucional por definir", style = MaterialTheme.typography.bodyMedium)
                 Text(
                     text = "2026",
                     style = MaterialTheme.typography.bodySmall,
@@ -106,3 +114,9 @@ private fun TeamCard(
         }
     }
 }
+
+private data class TeamMember(
+    val name: String,
+    val role: String,
+    val email: String,
+)
