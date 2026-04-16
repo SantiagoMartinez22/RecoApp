@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +49,7 @@ fun DetailScreen(
     onBack: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val isFavorite by viewModel.isFavorite.collectAsStateWithLifecycle()
 
     Box(modifier = Modifier.fillMaxSize()) {
         when (val s = state) {
@@ -59,7 +62,12 @@ fun DetailScreen(
                 )
             }
             is UiState.Success -> {
-                DetailContent(movie = s.data, onBack = onBack)
+                DetailContent(
+                    movie = s.data,
+                    onBack = onBack,
+                    isFavorite = isFavorite,
+                    onToggleFavorite = viewModel::toggleFavorite,
+                )
             }
             UiState.Idle -> Unit
         }
@@ -70,6 +78,8 @@ fun DetailScreen(
 private fun DetailContent(
     movie: Movie,
     onBack: () -> Unit,
+    isFavorite: Boolean,
+    onToggleFavorite: () -> Unit,
 ) {
     val context = LocalContext.current
     val backdrop = TmdbImageUrls.backdropUrl(movie.backdropPath)
@@ -239,6 +249,19 @@ private fun DetailContent(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Volver",
                 tint = MaterialTheme.colorScheme.onBackground,
+            )
+        }
+
+        IconButton(
+            onClick = onToggleFavorite,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 16.dp, end = 10.dp),
+        ) {
+            Icon(
+                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                contentDescription = if (isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
+                tint = MaterialTheme.colorScheme.primary,
             )
         }
     }
