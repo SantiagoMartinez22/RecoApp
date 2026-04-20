@@ -32,4 +32,16 @@ interface TmdbApi {
         @Query("api_key") apiKey: String,
         @Query("language") language: String = "es-ES",
     ): TvDetailDto
+
+    @GET("movie/{id}/watch/providers")
+    suspend fun movieWatchProviders(
+        @Path("id") id: Int,
+        @Query("api_key") apiKey: String,
+    ): WatchProvidersResponse
+
+    @GET("tv/{id}/watch/providers")
+    suspend fun tvWatchProviders(
+        @Path("id") id: Int,
+        @Query("api_key") apiKey: String,
+    ): WatchProvidersResponse
 }

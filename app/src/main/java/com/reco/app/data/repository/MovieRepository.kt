@@ -11,6 +11,8 @@ import com.reco.app.data.remote.TvDetailDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 class MovieRepository(
     private val api: TmdbApi = TmdbClient.api,
@@ -55,8 +57,16 @@ class MovieRepository(
             return@withContext Result.success(demoMovies().firstOrNull { it.id == id } ?: demoMovies().first())
         }
         runCatching {
-            val dto = api.movieDetail(id, key)
-            mapMovieDetail(dto)
+            coroutineScope {
+                val detailDeferred = async { api.movieDetail(id, key) }
+                val providersDeferred = async {
+                    runCatching { api.movieWatchProviders(id, key) }.getOrNull()
+                }
+                val dto = detailDeferred.await()
+                val providers = providersDeferred.await()
+                val platforms = resolveProviders(providers) ?: platformsForId(id)
+                mapMovieDetail(dto, platforms)
+            }
         }
     }
 
@@ -66,8 +76,16 @@ class MovieRepository(
             return@withContext Result.success(demoMovies().firstOrNull { it.id == id } ?: demoMovies().first())
         }
         runCatching {
-            val dto = api.tvDetail(id, key)
-            mapTvDetail(dto)
+            coroutineScope {
+                val detailDeferred = async { api.tvDetail(id, key) }
+                val providersDeferred = async {
+                    runCatching { api.tvWatchProviders(id, key) }.getOrNull()
+                }
+                val dto = detailDeferred.await()
+                val providers = providersDeferred.await()
+                val platforms = resolveProviders(providers) ?: platformsForId(id)
+                mapTvDetail(dto, platforms)
+            }
         }
     }
 
@@ -98,7 +116,7 @@ class MovieRepository(
         )
     }
 
-    private fun mapMovieDetail(dto: MovieDetailDto): Movie {
+    private fun mapMovieDetail(dto: MovieDetailDto, platforms: List<Platform>): Movie {
         val date = dto.releaseDate?.takeIf { it.length >= 4 } ?: ""
         val runtimeText = dto.runtime?.takeIf { it > 0 }?.let { minutesToText(it) } ?: ""
         val genres = dto.genres.orEmpty().map { it.name }.take(3)
@@ -113,11 +131,11 @@ class MovieRepository(
             posterPath = dto.posterPath,
             backdropPath = dto.backdropPath,
             voteAverage = dto.voteAverage ?: 0.0,
-            platforms = platformsForId(dto.id),
+            platforms = platforms,
         )
     }
 
-    private fun mapTvDetail(dto: TvDetailDto): Movie {
+    private fun mapTvDetail(dto: TvDetailDto, platforms: List<Platform>): Movie {
         val date = dto.firstAirDate?.takeIf { it.length >= 4 } ?: ""
         val runtimeMinutes = dto.episodeRunTime.orEmpty().firstOrNull() ?: 0
         val runtimeText = runtimeMinutes.takeIf { it > 0 }?.let { minutesToText(it) } ?: ""
@@ -133,7 +151,7 @@ class MovieRepository(
             posterPath = dto.posterPath,
             backdropPath = dto.backdropPath,
             voteAverage = dto.voteAverage ?: 0.0,
-            platforms = platformsForId(dto.id),
+            platforms = platforms,
         )
     }
 
@@ -143,6 +161,24 @@ class MovieRepository(
         return if (hours > 0) "$hours h ${minutes}m" else "${minutes}m"
     }
 
+    /**
+     * Maps a WatchProvidersResponse to known Platform entries using TMDb provider IDs.
+     * Checks ES first, then MX, then AR. Returns null if no match is found so callers
+     * can fall back to platformsForId().
+     */
+    private fun resolveProviders(response: com.reco.app.data.remote.WatchProvidersResponse?): List<Platform>? {
+        val results = response?.results ?: return null
+        val countryData = results["ES"] ?: results["MX"] ?: results["AR"] ?: return null
+        val providerIds = (countryData.flatrate.orEmpty() +
+                countryData.rent.orEmpty() +
+                countryData.buy.orEmpty())
+            .map { it.providerId }
+            .distinct()
+        val platforms = providerIds.mapNotNull { tmdbProviderToPlatform[it] }.distinct().take(3)
+        return platforms.ifEmpty { null }
+    }
+
+    /** Deterministic fallback when watch/providers returns no data for our regions. */
     private fun platformsForId(id: Int): List<Platform> {
         val all = Platform.entries.toList()
         val idx = abs(id) % all.size
@@ -150,6 +186,25 @@ class MovieRepository(
     }
 
     companion object {
+        /**
+         * TMDb watch-provider IDs → Platform.
+         * Source: https://www.themoviedb.org/talk/5f54a25c4de2e50040d4b9d8
+         */
+        private val tmdbProviderToPlatform: Map<Int, Platform> = mapOf(
+            8 to Platform.NETFLIX,
+            337 to Platform.DISNEY_PLUS,
+            390 to Platform.DISNEY_PLUS,
+            // HBO Max / Max
+            384 to Platform.HBO_MAX,
+            1899 to Platform.HBO_MAX,
+            // Prime Video
+            9 to Platform.PRIME_VIDEO,
+            119 to Platform.PRIME_VIDEO,
+            // Apple TV+
+            350 to Platform.APPLE_TV,
+            2 to Platform.APPLE_TV,
+        )
+
         private val genreNames: Map<Int, String> = mapOf(
             28 to "Acción",
             12 to "Aventura",

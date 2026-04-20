@@ -52,3 +52,19 @@ data class TvDetailDto(
     @SerializedName("episode_run_time") val episodeRunTime: List<Int>?,
     @SerializedName("genres") val genres: List<GenreDto>?,
 )
+
+data class WatchProviderDto(
+    @SerializedName("provider_id") val providerId: Int,
+    @SerializedName("provider_name") val providerName: String,
+    @SerializedName("logo_path") val logoPath: String?,
+)
+
+data class WatchProviderCountryDto(
+    @SerializedName("flatrate") val flatrate: List<WatchProviderDto>?,
+    @SerializedName("rent") val rent: List<WatchProviderDto>?,
+    @SerializedName("buy") val buy: List<WatchProviderDto>?,
+)
+
+data class WatchProvidersResponse(
+    @SerializedName("results") val results: Map<String, WatchProviderCountryDto>?,
+)
