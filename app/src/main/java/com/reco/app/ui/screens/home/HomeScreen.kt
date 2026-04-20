@@ -46,6 +46,7 @@ private val platformFilters = listOf(
     PlatformFilter(Platform.DISNEY_PLUS, "Disney+"),
     PlatformFilter(Platform.HBO_MAX, "HBO"),
     PlatformFilter(Platform.PRIME_VIDEO, "Prime"),
+    PlatformFilter(Platform.APPLE_TV, "Apple TV+"),
 )
 
 @Composable

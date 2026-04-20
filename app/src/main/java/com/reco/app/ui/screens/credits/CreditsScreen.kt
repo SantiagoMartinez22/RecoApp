@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
@@ -26,17 +28,26 @@ import androidx.compose.ui.unit.dp
 fun CreditsScreen(
     onBack: () -> Unit,
 ) {
+    val scrollState = rememberScrollState()
     val teamMembers = listOf(
         TeamMember(
-            name = "Equipo de desarrollo",
-            role = "Aplicación académica Kotlin / Android",
-            email = "Información institucional pendiente",
+            name = "Santiago Martinez",
+            role = "Desarrollador — Ingeniería de Software",
+        ),
+        TeamMember(
+            name = "Valeria Zuluaga",
+            role = "Desarrolladora — Ingeniería de Software",
+        ),
+        TeamMember(
+            name = "Miguel Aristizabal",
+            role = "Desarrollador — Ingeniería de Software",
         ),
     )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(scrollState)
             .padding(horizontal = 20.dp),
     ) {
         IconButton(onClick = onBack, modifier = Modifier.padding(top = 8.dp)) {
@@ -81,7 +92,10 @@ fun CreditsScreen(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(text = "Institución", style = MaterialTheme.typography.titleMedium)
-                Text(text = "Información institucional por definir", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = "Universidad Pontificia Bolivariana",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
                 Text(
                     text = "2026",
                     style = MaterialTheme.typography.bodySmall,
@@ -106,11 +120,13 @@ private fun TeamCard(
         Column(modifier = Modifier.padding(12.dp)) {
             Text(text = name, style = MaterialTheme.typography.titleMedium)
             Text(text = role, style = MaterialTheme.typography.bodyMedium)
-            Text(
-                text = email,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            if (email.isNotBlank()) {
+                Text(
+                    text = email,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 }
@@ -118,5 +134,5 @@ private fun TeamCard(
 private data class TeamMember(
     val name: String,
     val role: String,
-    val email: String,
+    val email: String = "",
 )

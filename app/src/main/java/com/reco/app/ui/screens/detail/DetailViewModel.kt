@@ -35,6 +35,14 @@ class DetailViewModel(
             initialValue = false,
         )
 
+    val customListNames: StateFlow<List<String>> = userPreferences.customLists
+        .map { lists -> lists.keys.toList() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList(),
+        )
+
     init {
         load()
     }
@@ -57,6 +65,12 @@ class DetailViewModel(
     fun toggleFavorite() {
         viewModelScope.launch {
             userPreferences.toggleFavorite(mediaType, id)
+        }
+    }
+
+    fun addToList(listName: String) {
+        viewModelScope.launch {
+            userPreferences.addToList(listName, favoriteKey)
         }
     }
 

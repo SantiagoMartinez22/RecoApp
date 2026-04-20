@@ -93,6 +93,14 @@ class SettingsViewModel(
 
     suspend fun sendPasswordResetEmail(email: String) = authRepository.sendPasswordResetEmail(email)
 
+    fun setUserName(name: String) {
+        val trimmed = name.trim()
+        if (trimmed.isBlank()) return
+        viewModelScope.launch {
+            userPreferences.setUserName(trimmed)
+        }
+    }
+
     companion object {
         fun Factory(
             userPreferences: UserPreferences,
