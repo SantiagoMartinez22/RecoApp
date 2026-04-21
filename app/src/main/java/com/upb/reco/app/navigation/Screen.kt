@@ -12,6 +12,7 @@ sealed class Screen(val route: String) {
     data object Search : Screen("search")
     data object Lists : Screen("lists")
     data object Settings : Screen("settings")
+    data object EditUser : Screen("edit-user")
 
     data object Credits : Screen("credits")
     data object Detail : Screen("detail/{mediaType}/{id}") {

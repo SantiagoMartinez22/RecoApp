@@ -33,6 +33,7 @@ import com.upb.reco.app.ui.screens.lists.ListsScreen
 import com.upb.reco.app.ui.screens.lists.ListsViewModel
 import com.upb.reco.app.ui.screens.search.SearchScreen
 import com.upb.reco.app.ui.screens.search.SearchViewModel
+import com.upb.reco.app.ui.screens.settings.EditUserScreen
 import com.upb.reco.app.ui.screens.settings.SettingsScreen
 import com.upb.reco.app.ui.screens.settings.SettingsViewModel
 import androidx.compose.ui.platform.LocalContext
@@ -102,6 +103,9 @@ fun MainScaffold(
                     onSeeAllByGenre = {
                         mainNavController.navigate(Screen.Search.route)
                     },
+                    onProfileClick = {
+                        mainNavController.navigate(Screen.EditUser.route)
+                    },
                 )
             }
             composable(Screen.Search.route) {
@@ -143,6 +147,19 @@ fun MainScaffold(
                         }
                     },
                     onNavigateToCredits = onNavigateToCredits,
+                )
+            }
+            composable(Screen.EditUser.route) {
+                val viewModel: SettingsViewModel = viewModel(
+                    factory = SettingsViewModel.Factory(
+                        userPreferences = userPreferences,
+                        themePreferences = themePreferences,
+                        authRepository = authRepository,
+                    ),
+                )
+                EditUserScreen(
+                    viewModel = viewModel,
+                    onBack = { mainNavController.popBackStack() },
                 )
             }
             composable(

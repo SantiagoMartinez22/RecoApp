@@ -31,6 +31,10 @@ Sigue **[docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md)** para:
 ./gradlew :app:assembleDebug
 ```
 
+## Privacy Policy (GitHub Pages)
+
+- Página: [Privacy Policy](https://santiagomartinez22.github.io/RecoApp/privacy-policy.html)
+
 ## Flujo
 
 - Sin sesión: **Splash** → **Registro** o **Login** → **Main** (barra inferior: Inicio con recomendaciones TMDB; otras pestañas stub).

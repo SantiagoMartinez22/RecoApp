@@ -1,6 +1,7 @@
 package com.upb.reco.app.ui.screens.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.upb.reco.app.data.model.Movie
@@ -55,6 +58,7 @@ fun HomeScreen(
     onMovieTap: (mediaType: String, id: Int) -> Unit,
     onSeeAllTrending: () -> Unit,
     onSeeAllByGenre: () -> Unit,
+    onProfileClick: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val selectedPlatform by viewModel.selectedPlatform.collectAsStateWithLifecycle()
@@ -97,6 +101,7 @@ fun HomeScreen(
                     onMovieTap = onMovieTap,
                     onSeeAllTrending = onSeeAllTrending,
                     onSeeAllByGenre = onSeeAllByGenre,
+                    onProfileClick = onProfileClick,
                 )
             }
             else -> Unit
@@ -112,6 +117,7 @@ private fun HomeContent(
     onMovieTap: (String, Int) -> Unit,
     onSeeAllTrending: () -> Unit,
     onSeeAllByGenre: () -> Unit,
+    onProfileClick: () -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -141,8 +147,17 @@ private fun HomeContent(
                     modifier = Modifier
                         .size(44.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                )
+                        .background(MaterialTheme.colorScheme.primary)
+                        .clickable(role = Role.Button, onClick = onProfileClick),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = avatarInitial(data.userName),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+                }
             }
         }
 
@@ -232,4 +247,10 @@ private fun HomeContent(
             }
         }
     }
+}
+
+private fun avatarInitial(userName: String): String {
+    val t = userName.trim()
+    if (t.isEmpty()) return "?"
+    return t.first().uppercaseChar().toString()
 }

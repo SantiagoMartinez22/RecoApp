@@ -62,6 +62,38 @@ android {
     }
 }
 
+androidComponents {
+    onVariants(selector().withBuildType("release")) { variant ->
+        variant.outputs.forEach { output ->
+            if (output is com.android.build.api.variant.impl.VariantOutputImpl) {
+                output.outputFileName = "com.upb.reco.app.apk"
+            }
+        }
+    }
+}
+
+afterEvaluate {
+    val renameReleaseAab: () -> Unit = {
+        val outDir = layout.buildDirectory.dir("outputs/bundle/release").get().asFile
+        val generated = outDir.listFiles()?.firstOrNull { it.isFile && it.extension == "aab" }
+        if (generated != null && generated.name == "app-release.aab") {
+            val target = File(outDir, "com.upb.reco.app.aab")
+            if (target.exists()) target.delete()
+            val renamed = generated.renameTo(target)
+            if (!renamed) {
+                generated.copyTo(target, overwrite = true)
+                generated.delete()
+            }
+        }
+    }
+
+    tasks.matching {
+        it.name in setOf("bundleRelease", "packageReleaseBundle", "signReleaseBundle")
+    }.configureEach {
+        doLast { renameReleaseAab() }
+    }
+}
+
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2024.11.00"))
     implementation("androidx.compose.ui:ui")
