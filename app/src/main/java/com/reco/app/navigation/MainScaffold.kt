@@ -1,6 +1,11 @@
 package com.reco.app.navigation
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -33,6 +38,7 @@ import com.reco.app.ui.screens.settings.SettingsScreen
 import com.reco.app.ui.screens.settings.SettingsViewModel
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.safeDrawing
 
 @Composable
 fun MainScaffold(
@@ -57,7 +63,9 @@ fun MainScaffold(
     )
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets.safeDrawing,
         bottomBar = {
             if (showBottomBar) {
                 RecoBottomNavBar(

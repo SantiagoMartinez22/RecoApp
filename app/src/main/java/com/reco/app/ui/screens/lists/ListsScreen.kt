@@ -25,7 +25,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,158 +58,156 @@ fun ListsScreen(
 
     val favorites = (state as? UiState.Success)?.data?.favorites.orEmpty()
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-        ) {
-            when (val s = state) {
-                is UiState.Loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                is UiState.Error -> {
-                    Text(
-                        text = s.message,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.align(Alignment.Center),
-                    )
-                }
-                is UiState.Success -> {
-                    val uiModel = s.data
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(18.dp),
-                    ) {
-                        item {
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Text(
-                                    text = "Listas",
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                )
-                                Text(
-                                    text = "Hola, ${uiModel.userName}. Gestiona tus favoritos y colecciones personales.",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        }
-
-                        item {
-                            Card(modifier = Modifier.fillMaxWidth()) {
-                                Column(
-                                    modifier = Modifier.padding(14.dp),
-                                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                                ) {
-                                    Text(
-                                        text = "Nueva lista",
-                                        style = MaterialTheme.typography.titleMedium,
-                                    )
-                                    RecoTextField(
-                                        value = newListName,
-                                        onValueChange = { newListName = it },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        placeholder = { Text("Ej. Películas pendientes") },
-                                    )
-                                    RecoPrimaryButton(
-                                        text = "Crear lista",
-                                        onClick = {
-                                            scope.launch {
-                                                val result = viewModel.createList(newListName)
-                                                result.fold(
-                                                    onSuccess = {
-                                                        newListName = ""
-                                                        snackbarHostState.showSnackbar("Lista creada")
-                                                    },
-                                                    onFailure = { error ->
-                                                        snackbarHostState.showSnackbar(error.message ?: "No se pudo crear la lista")
-                                                    },
-                                                )
-                                            }
-                                        },
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
-                                }
-                            }
-                        }
-
-                        item {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        when (val s = state) {
+            is UiState.Loading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            is UiState.Error -> {
+                Text(
+                    text = s.message,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.align(Alignment.Center),
+                )
+            }
+            is UiState.Success -> {
+                val uiModel = s.data
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(18.dp),
+                ) {
+                    item {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
-                                text = "Mis favoritos",
-                                style = MaterialTheme.typography.titleLarge,
+                                text = "Listas",
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = MaterialTheme.colorScheme.onBackground,
+                            )
+                            Text(
+                                text = "Hola, ${uiModel.userName}. Gestiona tus favoritos y colecciones personales.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
+                    }
 
-                        if (uiModel.favorites.isEmpty()) {
-                            item {
-                                Text(
-                                    text = "Todavía no agregaste favoritos.",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        } else {
-                            item {
-                                LazyRow(
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                    contentPadding = PaddingValues(end = 4.dp),
-                                ) {
-                                    items(uiModel.favorites, key = { movieKey(it) }) { movie ->
-                                        FavoriteMovieCard(
-                                            movie = movie,
-                                            onOpen = { onMovieTap(movie.mediaType, movie.id) },
-                                            onToggleFavorite = { viewModel.toggleFavorite(movie) },
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        item {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
+                    item {
+                        Card(modifier = Modifier.fillMaxWidth()) {
+                            Column(
+                                modifier = Modifier.padding(14.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp),
                             ) {
                                 Text(
-                                    text = "Mis listas",
-                                    style = MaterialTheme.typography.titleLarge,
+                                    text = "Nueva lista",
+                                    style = MaterialTheme.typography.titleMedium,
                                 )
-                                Text(
-                                    text = "${uiModel.customLists.size} activas",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                RecoTextField(
+                                    value = newListName,
+                                    onValueChange = { newListName = it },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    placeholder = { Text("Ej. Películas pendientes") },
                                 )
-                            }
-                        }
-
-                        if (uiModel.customLists.isEmpty()) {
-                            item {
-                                Text(
-                                    text = "Crea tu primera lista para organizar contenido.",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        } else {
-                            items(uiModel.customLists, key = { it.name }) { list ->
-                                CustomListCard(
-                                    list = list,
-                                    onMovieTap = onMovieTap,
-                                    onAddMovie = { selectedListForAdd = list.name },
-                                    onRemoveMovie = { movie -> viewModel.removeMovieFromList(list.name, movie) },
-                                    onDeleteList = { viewModel.deleteList(list.name) },
+                                RecoPrimaryButton(
+                                    text = "Crear lista",
+                                    onClick = {
+                                        scope.launch {
+                                            val result = viewModel.createList(newListName)
+                                            result.fold(
+                                                onSuccess = {
+                                                    newListName = ""
+                                                    snackbarHostState.showSnackbar("Lista creada")
+                                                },
+                                                onFailure = { error ->
+                                                    snackbarHostState.showSnackbar(error.message ?: "No se pudo crear la lista")
+                                                },
+                                            )
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
                                 )
                             }
                         }
                     }
+
+                    item {
+                        Text(
+                            text = "Mis favoritos",
+                            style = MaterialTheme.typography.titleLarge,
+                        )
+                    }
+
+                    if (uiModel.favorites.isEmpty()) {
+                        item {
+                            Text(
+                                text = "Todavía no agregaste favoritos.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    } else {
+                        item {
+                            LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                contentPadding = PaddingValues(end = 4.dp),
+                            ) {
+                                items(uiModel.favorites, key = { movieKey(it) }) { movie ->
+                                    FavoriteMovieCard(
+                                        movie = movie,
+                                        onOpen = { onMovieTap(movie.mediaType, movie.id) },
+                                        onToggleFavorite = { viewModel.toggleFavorite(movie) },
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = "Mis listas",
+                                style = MaterialTheme.typography.titleLarge,
+                            )
+                            Text(
+                                text = "${uiModel.customLists.size} activas",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+
+                    if (uiModel.customLists.isEmpty()) {
+                        item {
+                            Text(
+                                text = "Crea tu primera lista para organizar contenido.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    } else {
+                        items(uiModel.customLists, key = { it.name }) { list ->
+                            CustomListCard(
+                                list = list,
+                                onMovieTap = onMovieTap,
+                                onAddMovie = { selectedListForAdd = list.name },
+                                onRemoveMovie = { movie -> viewModel.removeMovieFromList(list.name, movie) },
+                                onDeleteList = { viewModel.deleteList(list.name) },
+                            )
+                        }
+                    }
                 }
-                UiState.Idle -> Unit
             }
+            UiState.Idle -> Unit
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 
     if (selectedListForAdd != null) {
@@ -229,6 +226,8 @@ fun ListsScreen(
         )
     }
 }
+
+private fun movieKey(movie: Movie): String = "${movie.mediaType}-${movie.id}"
 
 @Composable
 private fun FavoriteMovieCard(
@@ -335,14 +334,8 @@ private fun AddFavoriteToListDialog(
                     items(favorites, key = { movieKey(it) }) { movie ->
                         ListItem(
                             headlineContent = { Text(movie.title) },
-                            supportingContent = {
-                                Text(
-                                    text = listOf(movie.year, movie.mediaType.uppercase()).filter { it.isNotBlank() }.joinToString(" · "),
-                                )
-                            },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .clickable(onClick = { onMovieSelected(movie) }),
+                            supportingContent = { Text(movie.mediaType) },
+                            modifier = Modifier.clickable { onMovieSelected(movie) }
                         )
                     }
                 }
@@ -352,8 +345,6 @@ private fun AddFavoriteToListDialog(
             TextButton(onClick = onDismiss) {
                 Text("Cerrar")
             }
-        },
+        }
     )
 }
-
-private fun movieKey(movie: Movie): String = "${movie.mediaType}:${movie.id}"
