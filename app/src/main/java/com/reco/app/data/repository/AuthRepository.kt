@@ -4,6 +4,9 @@ import com.reco.app.data.preferences.UserPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 /**
  * Implementación **sin Firebase** para compilar y probar flujo UI/navegación.
@@ -35,10 +38,37 @@ class AuthRepository(
         genres: List<String>,
         keywords: String,
     ): Result<Unit> = withContext(Dispatchers.IO) {
-        delay(DEMO_DELAY_MS)
-        userPreferences.setUserName(name)
-        userPreferences.setUserEmail(email)
-        Result.success(Unit)
+        try {
+            val auth = FirebaseAuth.getInstance()
+            val db = FirebaseFirestore.getInstance()
+
+            val result = auth
+                .createUserWithEmailAndPassword(email, password)
+                .await()
+
+            val uid = result.user?.uid ?: throw Exception("No se pudo crear el usuario")
+
+            val userData = hashMapOf(
+                "name" to name,
+                "email" to email,
+                "genres" to genres,
+                "keywords" to keywords
+            )
+
+            db.collection("users")
+                .document(uid)
+                .set(userData)
+                .await()
+
+            // Opcional: guardar local también
+            userPreferences.setUserName(name)
+            userPreferences.setUserEmail(email)
+
+            Result.success(Unit)
+
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     suspend fun signOut(): Result<Unit> = withContext(Dispatchers.IO) {
