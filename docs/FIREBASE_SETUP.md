@@ -3,7 +3,7 @@
 ## 1. Crear el proyecto en Firebase Console
 
 1. Entra en [Firebase Console](https://console.firebase.google.com/) y crea un proyecto (o usa uno existente).
-2. Añade una app **Android** con el **package name**: `com.reco.app` (debe coincidir con `applicationId` en `app/build.gradle.kts`).
+2. Añade una app **Android** con el **package name**: `com.upb.reco.app` (debe coincidir con `applicationId` en `app/build.gradle.kts`).
 
 ## 2. Descargar `google-services.json`
 

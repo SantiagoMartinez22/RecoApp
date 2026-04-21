@@ -19,7 +19,7 @@ Sigue **[docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md)** para:
 
 ## Módulos y paquetes
 
-- `com.reco.app` — `MainActivity`, `RecoApplication`
+- `com.upb.reco.app` — `MainActivity`, `RecoApplication`
 - `navigation` — `Screen`, `RecoNavHost`, `MainScaffold` (tabs Inicio / Buscar / Listas / Ajustes)
 - `ui/theme` — colores del diseño, tipografía, `RecoTheme`, `ThemeViewModel` + DataStore
 - `ui/screens` — Splash, Login, Register, Home (`HomeViewModel` + TMDB)

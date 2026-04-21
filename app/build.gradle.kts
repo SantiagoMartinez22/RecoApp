@@ -16,11 +16,11 @@ val localProperties = Properties().apply {
 val tmdbApiKey: String = localProperties.getProperty("tmdb.api.key") ?: ""
 
 android {
-    namespace = "com.reco.app"
+    namespace = "com.upb.reco.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.reco.app"
+        applicationId = "com.upb.reco.app"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
