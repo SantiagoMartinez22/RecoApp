@@ -35,6 +35,10 @@ import androidx.compose.ui.unit.sp
 import com.reco.app.ui.components.RecoPrimaryButton
 import com.reco.app.ui.theme.RecoAccent
 import com.reco.app.ui.theme.RecoAccentDark
+import androidx.compose.foundation.Image
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import com.reco.app.R
 
 @Composable
 fun SplashScreen(
@@ -63,26 +67,14 @@ fun SplashScreen(
         Box(
             modifier = Modifier
                 .scale(scale)
-                .shadow(
-                    elevation = 24.dp,
-                    shape = RoundedCornerShape(28.dp),
-                    spotColor = RecoAccent.copy(alpha = 0.45f),
-                )
-                .size(100.dp)
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(RecoAccent, RecoAccentDark),
-                    ),
-                    shape = RoundedCornerShape(28.dp),
-                ),
+                .size(200.dp),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = "R",
-                color = Color.White,
-                fontSize = 42.sp,
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = (-2).sp,
+            Image(
+                painter = painterResource(id = R.drawable.logo2),
+                contentDescription = "Logo RECO",
+                modifier = Modifier
+                    .size(500.dp)
             )
         }
         Spacer(modifier = Modifier.height(28.dp))

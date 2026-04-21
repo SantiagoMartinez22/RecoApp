@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Reco" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.Reco" parent="Theme.SplashScreen">
+
+        <!-- Color de fondo al iniciar -->
+        <item name="windowSplashScreenBackground">@android:color/white</item>
+
+        <!-- TU LOGO 👇 -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
+
+        <!-- Tema después del splash -->
+        <item name="postSplashScreenTheme">@style/Theme.Reco.Main</item>
+
+    </style>
+
+    <!-- Tema normal de la app -->
+    <style name="Theme.Reco.Main" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
