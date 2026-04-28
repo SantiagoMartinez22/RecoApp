@@ -17,4 +17,4 @@ captures/
 .DS_Store
 
 # Firebase (optional: keep out of VCS if you prefer secrets local only)
-# app/google-services.json
+app/google-services.json
